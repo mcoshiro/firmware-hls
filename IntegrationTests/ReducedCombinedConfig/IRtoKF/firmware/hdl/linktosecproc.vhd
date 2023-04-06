@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-27
--- Last update: 2023-02-14
+-- Last update: 2023-04-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -90,19 +90,13 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   DL_39_link_AV_DOUT(PS10G_1_A) <= s_din_d(0).data(38 downto 0);
   DL_39_link_AV_DOUT(PS10G_2_A) <= s_din_d(1).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_B) <= s_din_d(2).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_d(3).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_B) <= s_din_d(4).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_d(5).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_d(6).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_B)    <= s_din_d(7).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_d(8).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_B)  <= s_din_d(9).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_d(10).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_B)  <= s_din_d(11).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(12).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(13).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_B)  <= s_din_d(14).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_d(2).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_d(3).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_d(4).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_d(5).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_d(6).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(7).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(8).data(38 downto 0);
 
   -----------------------------------------------------------------------------
   -- Generate start signal

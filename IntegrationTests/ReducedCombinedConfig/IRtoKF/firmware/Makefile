@@ -10,7 +10,7 @@ $(core_dir):
 	@mkdir cgn mem
 	make -C $(hls_script_path) -j 8 Work
 	ln -s ../../../../../emData/LUTsReduced mem/LUTs
-	ln -s ../../../../../emData/MemPrintsReduced mem/MemPrintsReduced
+	ln -s ../../../../../emData/MemPrintsReducedCM mem/MemPrintsReduced
 	ln -s ../../../../common hdl/common
 
 $(core_file): $(core_dir)

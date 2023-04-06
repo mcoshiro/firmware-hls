@@ -22,19 +22,13 @@ def parseArguments():
 mapping = {}
 mapping[0]  = "Link_DL_PS10G_1_A_04.dat"
 mapping[1]  = "Link_DL_PS10G_2_A_04.dat"
-mapping[2]  = "Link_DL_PS10G_2_B_04.dat"
-mapping[3]  = "Link_DL_PS10G_3_A_04.dat"
-mapping[4]  = "Link_DL_PS10G_3_B_04.dat"
-mapping[5]  = "Link_DL_PS_1_A_04.dat"
-mapping[6]  = "Link_DL_PS_2_A_04.dat"
-mapping[7]  = "Link_DL_PS_2_B_04.dat"
-mapping[8]  = "Link_DL_2S_1_A_04.dat"
-mapping[9]  = "Link_DL_2S_1_B_04.dat"
-mapping[10] = "Link_DL_2S_2_A_04.dat"
-mapping[11] = "Link_DL_2S_2_B_04.dat"
-mapping[12] = "Link_DL_2S_3_A_04.dat"
-mapping[13] = "Link_DL_2S_4_A_04.dat"
-mapping[14] = "Link_DL_2S_4_B_04.dat"
+mapping[2]  = "Link_DL_PS10G_3_A_04.dat"
+mapping[3]  = "Link_DL_PS_1_A_04.dat"
+mapping[4]  = "Link_DL_PS_2_A_04.dat"
+mapping[5]  = "Link_DL_2S_1_A_04.dat"
+mapping[6] = "Link_DL_2S_2_A_04.dat"
+mapping[7] = "Link_DL_2S_3_A_04.dat"
+mapping[8] = "Link_DL_2S_4_A_04.dat"
 
 #channels = ["q00c0","q00c1","q00c2","q00c3","q01c0","q01c1","q01c2","q01c3","q02c0","q02c1","q02c2","q02c3","q03c0","q03c1","q03c2","q03c3"]
 
