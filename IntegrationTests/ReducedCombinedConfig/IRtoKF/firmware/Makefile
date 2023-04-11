@@ -19,8 +19,11 @@ $(core_file): $(core_dir)
 kfin_adj:
 	@python3 scripts/kf_link_mod.py
 
-xciCreation: $(core_file)
+xciCreation: $(core_file) core_patch
 	make -f $(core_file) -j 8 all
+
+core_patch:
+	@sed -i 's/v7_1_10/v7_1_13/g' $(core_dir)/VMR_L1PHIB/hdl/ip/*.txt
 
 hdl_add_files: $(core_file)
 	cd hdl; ln -s ../../../hdl/*.vhd .
@@ -43,4 +46,4 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
 	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
-.PHONY: sim all hdl_add_files xciCreation kfin_adj lut_inclusion
+.PHONY: sim all hdl_add_files xciCreation kfin_adj lut_inclusion core_patch
