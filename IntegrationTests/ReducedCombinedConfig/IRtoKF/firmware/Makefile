@@ -19,11 +19,8 @@ $(core_file): $(core_dir)
 kfin_adj:
 	@python3 scripts/kf_link_mod.py
 
-xciCreation: $(core_file) core_patch
+xciCreation: $(core_file)
 	make -f $(core_file) -j 8 all
-
-core_patch:
-	@sed -i 's/v7_1_10/v7_1_13/g' $(core_dir)/VMR_L1PHIB/hdl/ip/*.vhd
 
 hdl_add_files: $(core_file)
 	cd hdl; ln -s ../../../hdl/*.vhd .
