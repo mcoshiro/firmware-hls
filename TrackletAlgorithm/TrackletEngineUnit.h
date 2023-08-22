@@ -63,7 +63,8 @@ class TrackletEngineUnit {
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
 #pragma HLS unroll
-      stubptinnerlutnew_[i] = stubptinnertmp[i];
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
     }
 //split the LUTs for overlaps/disks Vivado can only handle up to 1024 length LUT
     else if ( Seed >= TF::D1D2){   //Split 4 ways for overlaps, 2 ways for disks

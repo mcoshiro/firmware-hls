@@ -139,6 +139,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     zbin_ = data.getZBinNoFlag();
 
     auto projfinez = data.getFineZ();
+    projfinephi__ = data.getFinePhi();
      
     //Calculate fine z position
     const int detectorshift(8);
@@ -273,30 +274,32 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
 #endif
 
-  inline void set_empty() {
-    empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
-  }
+ inline void set_empty() {
+   empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+ }
 
-  inline bool empty() const {
-#pragma HLS inline
+ inline bool empty() const {
+#pragma HLS inline  
    return empty_;
-  }
-  inline bool nearFull() {
-   return nearFull4Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
-  }
+ }
+ 
+ inline bool nearFull() {
+   return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+ }
 
-  inline bool idle() {
-#pragma HLS inline
-    return idle_;
-  }
+ inline bool idle() {
+#pragma HLS inline  
+   return idle_;
+ }
 
-  inline INDEX readIndex() const {
-    return readindex_;
-  }
+ inline INDEX readIndex() const {
+   return readindex_;
+ }
 
-  inline INDEX writeIndex() const {
-    return writeindex_;
-  }
+ inline INDEX writeIndex() const {
+   return writeindex_;
+ }
+   
 
 inline bool processing() {
 #pragma HLS inline  

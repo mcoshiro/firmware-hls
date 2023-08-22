@@ -14,7 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <bitset>
-#include <cmath>
+
 
 namespace PR
 {
@@ -1203,7 +1203,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
-
+  //FIXME moved this into main loop - jf
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
@@ -1213,7 +1213,7 @@ void MatchProcessor(BXType bx,
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin, projin);
-  
+
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -1344,7 +1344,8 @@ void MatchProcessor(BXType bx,
     }
     std::cout << std::endl;
     */
-    
+
+     
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
@@ -1376,12 +1377,8 @@ void MatchProcessor(BXType bx,
       
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
-*/    
 
-    if (hasMatch) {
-      matchengine[bestiMEU].advance();
-    }
-
+    */
 
     ProjectionRouterBuffer<VMPTYPE,APTYPE> tmpprojbuff = projbufferarray.peek();
     if (anyidle && !empty) {
@@ -1407,7 +1404,7 @@ void MatchProcessor(BXType bx,
 
     } //end MEU loop
     
-    if (hasMatch) {
+    if(hasMatch) {
  
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
@@ -1427,12 +1424,7 @@ void MatchProcessor(BXType bx,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
-    if (validproj__) {
-
-      projbufferarray.saveProjection(projbuffer__);
-      projbufferarray.incProjection();
-     
-    }
+    
 
       
     if (validin_) {
@@ -1536,10 +1528,6 @@ void MatchProcessor(BXType bx,
 
       typename ProjectionRouterBuffer<BARREL, APTYPE>::PHIPROJBIN phiProjBin  = 0;
       
-      //If the projection goes to the first (ivmMinus) phiProjBin is zero but
-      //if the projection goes to the second bin ivmMinus+1 phiProjBin is one
-      typename ProjectionRouterBuffer<BARREL, APTYPE>::PHIPROJBIN phiProjBin  = 0; 
-
       if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
         ivmPlus++;
       }
@@ -1602,16 +1590,6 @@ void MatchProcessor(BXType bx,
       
     } // end if(validin)
 
-      //projbufferarray.saveProjection(projbuffertmp);
-
-      //if (maskstubs!=0) {
-      //	projbufferarray.incProjection();
-      //}
-      
-    } else {
-      validproj__ = false;
-    }// end if(validin)
-    
     projdata_ = projdata;
     validin_ = validin;
 
@@ -1627,7 +1605,7 @@ void MatchProcessor(BXType bx,
     } else {
       validin = false;
     }// end if not near full
-     
+
   } //end loop
 
   bx_o = bx;

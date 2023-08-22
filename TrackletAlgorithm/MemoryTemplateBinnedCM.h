@@ -122,6 +122,7 @@ class MemoryTemplateBinnedCM{
     return dataarray_[icopy];
   }
 
+
   const DataType (&get_mem() const)[NCOPY][1<<NBIT_BX][1<<NBIT_ADDR] {
     return dataarray_;
   }
@@ -132,7 +133,7 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][index];
   }
-
+  
   DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_BIN> slot,
 		    ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
@@ -140,12 +141,12 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
-
+  
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 
 #pragma HLS inline
-
+    
     if(!NBIT_BX) ibx = 0;
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
@@ -153,14 +154,13 @@ class MemoryTemplateBinnedCM{
       //icopy comparison must be signed int or future SW fails
       writememloop:for (signed int icopy=0;icopy< (signed) NCOPY;icopy++) {
 #pragma HLS unroll
-	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
+        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
-
+      
       #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
-      //(ibin,ireg)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
@@ -178,7 +178,7 @@ class MemoryTemplateBinnedCM{
       return false;
     }
   }
-
+  
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
