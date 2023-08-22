@@ -56,7 +56,7 @@ The files that are downloaded by emData/download.sh were created by the CMSSSW L
 cmsrel CMSSW_12_0_0_pre4
 cd CMSSW_12_0_0_pre4/src/
 cmsenv
-git cms-checkout-topic -u cms-L1TK:fw_synch_220523
+git cms-checkout-topic -u cms-L1TK:fw_synch_230620
 ```
 
 A few configuration changes were made in order to output test vectors and lookup tables and adjust truncation. This required editing parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h to match the following excerpts:
@@ -64,9 +64,10 @@ A few configuration changes were made in order to output test vectors and lookup
 ```c++
 …
     //IR should be set to 108 to match the FW for the summer chain, but ultimately should be at 156
-    std::unordered_map<std::string, unsigned int> maxstep_{{"IR", 108},  //IR will run at a higher clock speed to handle
-                                                                         //input links running at 25 Gbits/s
-                                                           //Set to 108 to match firmware project 240 MHz clock
+    std::unordered_map<std::string, unsigned int> maxstep_{
+        {"IR", 108},  //IR will run at a higher clock speed to handle
+                      //input links running at 25 Gbits/s
+        //Set to 108 to match firmware project 240 MHz clock
 …
     //--- These used to create files needed by HLS code.
     bool writeMem_{true};     //If true will print out content of memories (between algo steps) to files
@@ -158,7 +159,8 @@ also set to true in L1Trigger/TrackFindingTracklet/interface/Settings.h:
 
 ```c++
 …
-    bool combined_{true};  // use combined TP (TE+TC) and MP (PR+ME+MC) configuration
+    // Use combined TP (TE+TC) and MP (PR+ME+MC) configuration (with prompt tracking)
+    bool combined_{true};
 …
 ```
 
@@ -367,10 +369,18 @@ Build the tracklet chain in EMP.
 
 Currently the supported chain configurations for EMP builds are:
 
-* **Skinny Chain**
+* **Skinny Chain (non-combined modules)**
   * InputRouter to KalmanFilter
-    * Target: Apollo VU7P
-    * Path: `IntegrationTests/ReducedConfig/IRtoKF`
+    * Target = Apollo VU7P
+    * EMP build path = `IntegrationTests/ReducedConfig/IRtoKF`
+    
+* **Some info**
+
+    * The EMP firmware uses a subset of the [SURF library](https://github.com/slaclab/surf).
+    More info on that in `IntegrationTests/common/hdl/surf_subset/README.md`
+    * `firmware-hls/KalmanFilter` is a git sub-module link to the repo containing the [Kalman Filter firmware repo](https://github.com/cms-L1TK/l1tk-for-emp/tree/d0d3ba506bf77926862f0d7f3ebf781c041da6eb). (Action: Update to point to master, once it is compatible with EMP v0.7).   
+    * Some python and TCL script are needed to implement and simulate the EMP firmware.
+    More info on that in [this README](https://github.com/cms-L1TK/firmware-hls/blob/doc_emp/IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md).
 
 ### Prerequisites
 
