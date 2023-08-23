@@ -61,12 +61,12 @@ architecture rtl of emp_payload is
   signal s_IR_data            : t_arr_DL_39_DATA;
   signal s_ir_start           : std_logic;
   signal s_bx                 : std_logic_vector(2 downto 0);
-  signal s_TW_84_stream_data  : t_arr_TW_84_DATA;
-  signal s_TW_84_stream_valid : t_arr_TW_84_1b;
+  signal s_TW_98_stream_data  : t_arr_TW_98_DATA;
+  signal s_TW_98_stream_valid : t_arr_TW_98_1b;
   signal s_BW_46_stream_data  : t_arr_BW_46_DATA;
   signal s_BW_46_stream_valid : t_arr_BW_46_1b;
   signal s_FT_bx_out_vld      : std_logic;
-  signal s_tftokf             : t_channlesTB(numTW_84 - 1 downto 0);
+  signal s_tftokf             : t_channlesTB(numTW_98 - 1 downto 0);
   signal s_kfout              : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout              : ldata(numLinksTFP - 1 downto 0);
 
@@ -112,9 +112,9 @@ begin  -- architecture rtl
       DL_39_link_AV_dout      => s_IR_data,
       DL_39_link_empty_neg    => (others => '1'),
       DL_39_link_read         => open,
-      TW_84_stream_AV_din     => s_TW_84_stream_data,
-      TW_84_stream_A_full_neg => (others => '1'),
-      TW_84_stream_A_write    => s_TW_84_stream_valid,
+      TW_98_stream_AV_din     => s_TW_98_stream_data,
+      TW_98_stream_A_full_neg => (others => '1'),
+      TW_98_stream_A_write    => s_TW_98_stream_valid,
       BW_46_stream_AV_din     => s_BW_46_stream_data,
       BW_46_stream_A_full_neg => (others => '1'),
       BW_46_stream_A_write    => s_BW_46_stream_valid
@@ -126,9 +126,9 @@ begin  -- architecture rtl
   -- secproctolink_1 : entity work.secproctolink
   --   port map (
   --     clk_i                   => clk_p,
-  --     TW_84_stream_data_i     => s_TW_84_stream_data,
-  --     TW_84_stream_write_i    => s_TW_84_stream_valid,
-  --     TW_84_stream_full_neg_o => open,
+  --     TW_98_stream_data_i     => s_TW_98_stream_data,
+  --     TW_98_stream_write_i    => s_TW_98_stream_valid,
+  --     TW_98_stream_full_neg_o => open,
   --     BW_46_stream_data_i     => s_BW_46_stream_data,
   --     BW_46_stream_write_i    => s_BW_46_stream_valid,
   --     BW_46_stream_full_neg_i => open,
@@ -141,8 +141,8 @@ begin  -- architecture rtl
   tf_to_kf_1 : entity work.tf_to_kf
     port map (
       clk_i         => clk_p,
-      TW_84_data_i  => s_TW_84_stream_data,
-      TW_84_valid_i => s_TW_84_stream_valid,
+      TW_98_data_i  => s_TW_98_stream_data,
+      TW_98_valid_i => s_TW_98_stream_valid,
       BW_46_data_i  => s_BW_46_stream_data,
       BW_46_valid_i => s_BW_46_stream_valid,
       kf_reset_i    => s_FT_bx_out_vld,

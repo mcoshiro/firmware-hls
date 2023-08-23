@@ -35,9 +35,9 @@ use surf.AxiStreamPkg.all;
 entity secproctolink is
   port (
     clk_i                   : in  std_logic;
-    TW_84_stream_data_i     : in  t_arr_TW_84_DATA;
-    TW_84_stream_write_i    : in  t_arr_TW_84_1b;
-    TW_84_stream_full_neg_o : out t_arr_TW_84_1b;
+    TW_98_stream_data_i     : in  t_arr_TW_98_DATA;
+    TW_98_stream_write_i    : in  t_arr_TW_98_1b;
+    TW_98_stream_full_neg_o : out t_arr_TW_98_1b;
     BW_46_stream_data_i     : in  t_arr_BW_46_DATA;
     BW_46_stream_write_i    : in  t_arr_BW_46_1b;
     BW_46_stream_full_neg_i : out t_arr_BW_46_1b;
@@ -80,15 +80,15 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   -- FIFO input array
   -----------------------------------------------------------------------------
-  s_fifo_valid_vec                 <= TW_84_stream_write_i(L1L2) & BW_46_stream_write_i(L1L2_L3) & BW_46_stream_write_i(L1L2_L4) & BW_46_stream_write_i(L1L2_L5) & BW_46_stream_write_i(L1L2_L6);
+  s_fifo_valid_vec                 <= TW_98_stream_write_i(L1L2) & BW_46_stream_write_i(L1L2_L3) & BW_46_stream_write_i(L1L2_L4) & BW_46_stream_write_i(L1L2_L5) & BW_46_stream_write_i(L1L2_L6);
   s_fifo_valid                     <= or_reduce(s_fifo_valid_vec);
-  TW_84_stream_full_neg_o(L1L2)    <= s_fifo_ready;
+  TW_98_stream_full_neg_o(L1L2)    <= s_fifo_ready;
   BW_46_stream_full_neg_i(L1L2_L3) <= s_fifo_ready;
   BW_46_stream_full_neg_i(L1L2_L4) <= s_fifo_ready;
   BW_46_stream_full_neg_i(L1L2_L5) <= s_fifo_ready;
   BW_46_stream_full_neg_i(L1L2_L6) <= s_fifo_ready;
   s_fifo_data                      <= x"805A0123456" &
-                 TW_84_stream_data_i(L1L2) &
+                 TW_98_stream_data_i(L1L2) &
                  BW_46_stream_data_i(L1L2_L3) &
                  BW_46_stream_data_i(L1L2_L4) &
                  BW_46_stream_data_i(L1L2_L5) &

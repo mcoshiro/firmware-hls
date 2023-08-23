@@ -32,12 +32,12 @@ use work.hybrid_tools.all;
 entity tf_to_kf is
   port (
     clk_i         : in  std_logic;
-    TW_84_data_i  : in  t_arr_TW_84_data;
-    TW_84_valid_i : in  t_arr_TW_84_1b;
+    TW_98_data_i  : in  t_arr_TW_98_data;
+    TW_98_valid_i : in  t_arr_TW_98_1b;
     BW_46_data_i  : in  t_arr_BW_46_DATA;
     BW_46_valid_i : in  t_arr_BW_46_1b;
     kf_reset_i    : in  std_logic;
-    tftokf_o      : out t_channlesTB(numTW_84 - 1 downto 0)
+    tftokf_o      : out t_channlesTB(numTW_98 - 1 downto 0)
     );
 end entity tf_to_kf;
 
@@ -55,13 +55,13 @@ begin  -- architecture rtl
       for i in BW_46_data_i'range loop
         tftokf_o(0).stubs(enum_BW_46'pos(i)).reset <= kf_reset_i;
       end loop;  -- i
-      if TW_84_valid_i(L1L2) = '1' then
-        tftokf_o(0).track.valid    <= TW_84_data_i(L1L2)(1 + widthTBseedType + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1);
-        tftokf_o(0).track.seedtype <= TW_84_data_i(L1L2)(widthTBseedType + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap);
-        tftokf_o(0).track.inv2R    <= TW_84_data_i(L1L2)(widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap);
-        tftokf_o(0).track.phi0     <= TW_84_data_i(L1L2)(widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBz0 + widthTBcot + widthTrackletLmap);
-        tftokf_o(0).track.z0       <= TW_84_data_i(L1L2)(widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBcot + widthTrackletLmap);
-        tftokf_o(0).track.cot      <= TW_84_data_i(L1L2)(widthTBcot + widthTrackletLmap - 1 downto widthTrackletLmap);
+      if TW_98_valid_i(L1L2) = '1' then
+        tftokf_o(0).track.valid    <= TW_98_data_i(L1L2)(1 + widthTBseedType + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1);
+        tftokf_o(0).track.seedtype <= TW_98_data_i(L1L2)(widthTBseedType + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap);
+        tftokf_o(0).track.inv2R    <= TW_98_data_i(L1L2)(widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap);
+        tftokf_o(0).track.phi0     <= TW_98_data_i(L1L2)(widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBz0 + widthTBcot + widthTrackletLmap);
+        tftokf_o(0).track.z0       <= TW_98_data_i(L1L2)(widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBcot + widthTrackletLmap);
+        tftokf_o(0).track.cot      <= TW_98_data_i(L1L2)(widthTBcot + widthTrackletLmap - 1 downto widthTrackletLmap);
       end if;
       for i in BW_46_data_i'range loop
         tftokf_o(0).stubs(enum_BW_46'pos(i)).valid   <= BW_46_data_i(i)(1 + widthTBtrackId + widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1);

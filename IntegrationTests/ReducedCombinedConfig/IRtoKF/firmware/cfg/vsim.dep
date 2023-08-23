@@ -17,4 +17,4 @@ src -c emp-fwk:components/links/slink emp_slink_types.vhd
 #src -u sim ../mem/in.txt
 src -u sim ../scripts/pre_msim.tcl
 
-include -c emp-fwk:boards/apollo/cm_v1/vu7p device.dep packages_cm_v1.dep
+include -c emp-fwk:boards/apollo/cm_v2/vu13p device.dep packages_cm_v2.dep
