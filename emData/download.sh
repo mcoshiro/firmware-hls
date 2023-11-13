@@ -10,8 +10,8 @@ memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/4jZdh
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/mcGz25JNu19Oqzm/LUTs.tar.gz"
 # Combined modules
 # Updated files from Jason for TP disk with extra sign bit for disks in AllInnerStubs memories. This is in cmssw PR #230
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrintsCM_230822.tgz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/uoKcrxMXtjVHagL/LUTs.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/Gfv0lbIVWBdFsoa/MemPrints_10242023.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/CfDiIlwterSBOSZ/LUTs.tar.gz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/g0EIkgWgie5mBob/MemPrints.tar.gz"
 luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HT8q7fk4UvhpdPK/LUTs.tar.gz"
@@ -307,7 +307,7 @@ do
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}_`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.

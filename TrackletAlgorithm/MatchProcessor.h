@@ -928,10 +928,6 @@ void MatchCalculator(BXType bx,
   const auto kr_corr_shift       = (LAYER < TF::D1)? 0 : 7;                                  // shifttmp2 in emulation
 
   const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
-  const auto LUT_matchcut_phi_width = 17;
-  const auto LUT_matchcut_phi_depth = 12;
-  const auto LUT_matchcut_z_width = 13;
-  const auto LUT_matchcut_z_depth = 12;
 
   // Setup look up tables for match cuts
   ap_uint<MC::LUT_matchcut_phi_width> LUT_matchcut_phi[MC::LUT_matchcut_phi_depth];
@@ -1000,7 +996,6 @@ void MatchCalculator(BXType bx,
   typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
   typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
   typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
-  bool isProjDisk = proj_seed >= TF::D1;
 
   // Calculate residuals
   // Get phi and z correction
@@ -1197,7 +1192,7 @@ void MatchProcessor(BXType bx,
   constexpr regionType APTYPE = TF::layerDiskType[LAYER];
 
   //Initialize table for bend-rinv consistency
-  ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
+  ap_uint<1> table[kNMatchEngines][LAYER<TF::D1 ? (LAYER<TF::L4 ? 256 : 512) : 768]; //FIXME Need to figure out how to replace 256 with meaningful const.
   //Use of dim=0 seems to have small improvement on timing - not sure why
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
@@ -1217,8 +1212,6 @@ void MatchProcessor(BXType bx,
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
-
-  constexpr unsigned int kNBitsBuffer=3;
 
   // declare counters for each of the 8 different seeds.
   //FIXME should have propoer seven bit type
@@ -1274,7 +1267,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
   constexpr int nRbinBits = VMProjection<VMPTYPE>::kVMProjFineZSize + VMProjectionBase<VMPTYPE>::kVMProjZBinSize;
-  constexpr int nRbin = 1<<TrackletProjection<PROJTYPE>::kTProjRZSize;
   static ap_uint<nRbinBits> rbinLUT[256];//1<<TrackletProjection<PROJTYPE>::kTProjRZSize];
 #pragma HLS ARRAY_PARTITION variable=rbinLUT complete
   readRbin_LUT<LAYER,nRbinBits,256>(rbinLUT);
@@ -1295,19 +1287,18 @@ void MatchProcessor(BXType bx,
 
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
-  constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
-  constexpr int PAGE_LENGTH_CM = 1024;
   constexpr int BIN_ADDR_WIDTH = 4;
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
-    if (hasMatch)
+    if (hasMatch) {
       matchengine[bestiMEU].advance();
+    }
 
-      if (increase) {
-        projbufferarray.incProjection();
-        increase = false;
-      }
+    if (increase) {
+      projbufferarray.incProjection();
+      increase = false;
+    }
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -1346,23 +1337,19 @@ void MatchProcessor(BXType bx,
     std::cout << std::endl;
     */
 
-     
-    //New code
-    ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
-    ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
-    ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
+    //New code -- updated to reduce timing, compare all projseqs in one stage instead of two
 
-    projseq01tmp = Bit01 ? projseqs[0] : projseqs[1];
-    projseq23tmp = Bit23 ? projseqs[2] : projseqs[3];
-    
-    ap_uint<1> Bit0123 = projseq01tmp < projseq23tmp;
+    ap_uint<1> Bit10 = projseqs[1] < projseqs[0];
+    ap_uint<1> Bit20 = projseqs[2] < projseqs[0];
+    ap_uint<1> Bit30 = projseqs[3] < projseqs[0];
+    ap_uint<1> Bit21 = projseqs[2] < projseqs[1];
+    ap_uint<1> Bit31 = projseqs[3] < projseqs[1];
+    ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
 
-    projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
-    
-    bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+    bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
 
     hasMatch = !emptys[bestiMEU];
-    
+
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
@@ -1512,7 +1499,6 @@ void MatchProcessor(BXType bx,
       // number of bits used to distinguish between VMs within a module
       constexpr auto nbits_vmme = nbits_vmmeall[LAYER];
       constexpr auto nvmbits_ = nbits_vmme + nbitsallstubs[LAYER];
-      constexpr auto nbins_vmme = 1 << nbits_vmme;
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
