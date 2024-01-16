@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "VMStubTEOuterMemoryCM.h"
 #include "TrackletProcessor_parameters.h"
+#include "TrackletParameterMemory.h"
 
 template<TF::seed Seed, TC::itc iTC, regionType innerRegion,regionType VMSTEType>
 class TrackletEngineUnit {
@@ -15,11 +16,11 @@ class TrackletEngineUnit {
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
     kNBitsNegDiskSize=1,
-    kNBitsPTLutInner=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
-    kNBitsPTLutOuter=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
+    kNBitsPTLutInner=(Seed==TF::L5L6||Seed==TF::L1D1||Seed==TF::L2D1||Seed==TF::D1D2||Seed==TF::D3D4)?1024:(Seed==TF::L1L2||Seed==TF::L2L3||Seed==TF::L3L4)?256:512,
+    kNBitsPTLutOuter=(Seed==TF::L5L6||Seed==TF::L1D1||Seed==TF::L2D1||Seed==TF::D1D2||Seed==TF::D3D4)?1024:(Seed==TF::L1L2||Seed==TF::L2L3)?256:512
   };
 
-  typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
+  typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+AllStub<innerRegion>::kAllStubSize+TrackletParameters::kTParPhiRegionSize+kNBits_MemAddr> STUBID;
   typedef ap_uint<kNBitsNegDiskSize> NEGDISK;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;
@@ -55,7 +56,6 @@ class TrackletEngineUnit {
 
     const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
     const ap_uint<1>* stubptoutertmp = getPTOuterLUT<Seed,iTC>();
-
     if ( Seed <= TF::L5L6 ){
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll

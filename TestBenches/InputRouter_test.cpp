@@ -42,18 +42,11 @@ CablingMap getMap( std::string pInputWiresMap )
     // read line 
     // and look for connections where 
     // VMR is the output 
-    bool cFoundInputLink=false;
     
     std::string cInputLink = "";
     std::string cVMRMemory = "";
     while (cStream >> cToken) 
     {
-      if( cPrevToken.find("input") != std::string::npos 
-        && cToken.find("output") != std::string::npos ) 
-      {
-        cFoundInputLink = true;
-      }
-
       if( cPrevToken.find("output") != std::string::npos 
         && cToken.find("VMR") != std::string::npos ) 
       {
@@ -168,18 +161,11 @@ DtcMap getCablingMap( std::string pInputWiresMap )
     // read line 
     // and look for connections where 
     // VMR is the output 
-    bool cFoundInputLink=false;
     
     std::string cInputLink = "";
     std::string cVMRMemory = "";
     while (cStream >> cToken) 
     {
-      if( cPrevToken.find("input") != std::string::npos 
-        && cToken.find("output") != std::string::npos ) 
-      {
-        cFoundInputLink = true;
-      }
-
       if( cPrevToken.find("output") != std::string::npos 
         && cToken.find("VMR") != std::string::npos ) 
       {
@@ -361,7 +347,7 @@ DtcMemWrd getNMemories( CablingMap pDtcMap
       if( cBnWrd.range(cPhiBn,cPhiBn) == 1 ) cPhiBns.push_back(cPhiBn);
       /*
       // re-construct file name 
-      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      std::string cFileName = "InputStubs/"; 
       cFileName += getMemPrintName( cDtcName, pNonant, cLyr,  (int)cPhiBn);
       //std::cout << "\tLooking for memory print " << cFileName << "\n";
       std::ifstream fin_mem_prints;
@@ -403,7 +389,7 @@ BnDscs getBns( CablingMap pDtcMap
     for( size_t cPhiBn=0; cPhiBn<kMaxPhiBnsPrLyr; cPhiBn++)
     {
       // re-construct file name 
-      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      std::string cFileName = "InputStubs/"; 
       cFileName += getMemPrintName( cDtcName, pNonant, cLyr,  (int)cPhiBn);
       std::ifstream fin_mem_prints;
       bool cPrintError=false;
@@ -454,8 +440,8 @@ ap_uint<kLINKMAPwidth> getLnkWrd(CablingMap pDtcMap
 }
 void decodeLnkWrd(ap_uint<kLINKMAPwidth> pLnkWrd)
 {
-  int cNlyrs = pLnkWrd.range( kLINKMAPwidth-1, kLINKMAPwidth-1-(3-1));
-  int cIs2S = pLnkWrd.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
+  unsigned int cNlyrs = pLnkWrd.range( kLINKMAPwidth-1, kLINKMAPwidth-1-(3-1));
+  unsigned int cIs2S = pLnkWrd.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
   std::cout << "LnkWrd 0x" 
     << std::hex  << int(pLnkWrd) << std::dec 
     << "\t..."
@@ -497,7 +483,7 @@ void prepareInputStreams( ifstream * pInputStreams
   auto hLinkWord = getLnkWrd(pDtcMap,pLinkId);
   int cMemIndx=0;
   std::vector<uint8_t> cLyrs = getLyrs( pDtcMap , pLinkId );
-  for(int cLyrIndx=0; cLyrIndx< cLyrs.size(); cLyrIndx++)
+  for(unsigned int cLyrIndx=0; cLyrIndx< cLyrs.size(); cLyrIndx++)
   {
     ap_uint<kSizeLinkWord> hWrd = hLinkWord.range(kSizeLinkWord*cLyrIndx+kSizeLinkWord-1,kSizeLinkWord*cLyrIndx);
     //if( hWrd == 0) continue;
@@ -510,7 +496,7 @@ void prepareInputStreams( ifstream * pInputStreams
     {
       if( cBnWrd.range(cPhiBn,cPhiBn) == 0 ) continue;
       
-      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      std::string cFileName = "InputStubs/"; 
       std::string cMemPrint = getMemPrintName( cDtcName, pNonant, hLyrId + cLyrCorr, cPhiBn ); 
       cFileName += cMemPrint;
 
@@ -567,7 +553,7 @@ int main(int argc, char * argv[])
 
   // allow for truncation memory check [i.e. missing entries can pass check]
   bool cTruncation=false;
-  std::string cInputFile_Wires = "emData/LUTs/wires.dat";
+  std::string cInputFile_Wires = "LUTsCM/wires.dat";
   
   auto cMap = getMap( cInputFile_Wires ); 
   // for( uint8_t cLinkIndx=0; cLinkIndx < 20; cLinkIndx++)
@@ -582,7 +568,7 @@ int main(int argc, char * argv[])
   std::cout << "Link#" << cLinkId << " fills " << +cTotalNmems << " output memories." << "\n";
   // link name
   std::string cLinkName = getLinkName( cMap, cLinkId , cNonant ); 
-  std::string cBaseName  = "emData/MemPrints/InputStubs/";
+  std::string cBaseName  = "InputStubs/";
   std::string cInputFile_Link = cBaseName + cLinkName + ".dat";
   std::cout << "Input file for Link# " << cLinkId << " is " <<  cInputFile_Link << std::endl;
   // link word

@@ -31,22 +31,22 @@ static const int kNMEMwidth = 5;
 // LUT with phi corrections to the nominal radius. Only used by layers.
 // Values are determined by the radius and the bend of the stub.
 const int kPhiCorrtable_L1[] =
-#include "../emData/LUTs/VMPhiCorrL1.tab"
+#include "../emData/LUTsCM/VMPhiCorrL1.tab"
 ;
 const int kPhiCorrtable_L2[] =
-#include "../emData/LUTs/VMPhiCorrL2.tab"
+#include "../emData/LUTsCM/VMPhiCorrL2.tab"
 ;
 const int kPhiCorrtable_L3[] =
-#include "../emData/LUTs/VMPhiCorrL3.tab"
+#include "../emData/LUTsCM/VMPhiCorrL3.tab"
 ;
 const int kPhiCorrtable_L4[] =
-#include "../emData/LUTs/VMPhiCorrL4.tab"
+#include "../emData/LUTsCM/VMPhiCorrL4.tab"
 ;
 const int kPhiCorrtable_L5[] =
-#include "../emData/LUTs/VMPhiCorrL5.tab"
+#include "../emData/LUTsCM/VMPhiCorrL5.tab"
 ;
 const int kPhiCorrtable_L6[] =
-#include "../emData/LUTs/VMPhiCorrL6.tab"
+#include "../emData/LUTsCM/VMPhiCorrL6.tab"
 ;
 
 
@@ -208,7 +208,7 @@ void ClearCounters(unsigned int nMemories
 #pragma HLS inline
 #pragma HLS array_partition variable = nEntries complete
   LOOP_ClearCounters:
-	for (int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
+	for (unsigned int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
   {
 #pragma HLS unroll
     nEntries[cIndx]=0; 
@@ -225,7 +225,7 @@ void CountMemories(const ap_uint<kBINMAPwidth> hPhBnWord
 #pragma HLS array_partition variable = nMemsPerLyr complete
   int cPrevSize=0; 
   LOOP_CountOutputMemories:
-  for (int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
+  for (unsigned int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
   {
 #pragma HLS unroll
     //auto hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);

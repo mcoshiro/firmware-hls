@@ -25,8 +25,8 @@ set module_to_export FT_L1L2
 open_project -reset trackBuilder
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
-add_files ../TopFunctions/TrackBuilderTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+add_files ../TopFunctions/CombinedConfig/TrackBuilderTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackBuilder_test.cpp -cflags "$CFLAGS"
 
 # data files
@@ -38,7 +38,7 @@ foreach i $modules_to_test {
   set top_func [join [list "TrackBuilder_" $seed] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
+  set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $top_func

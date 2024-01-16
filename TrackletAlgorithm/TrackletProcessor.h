@@ -226,6 +226,7 @@ namespace TC {
   template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion, uint32_t TPROJMaskBarrel, uint32_t TPROJMaskDisk> void
     processStubPair(
 		    const BXType bx,
+		    const ap_uint<TrackletParameters::kTParPhiRegionSize> phiRegion,
 		    const ap_uint<kNBits_MemAddr> innerIndex,
 		    const AllStub<InnerRegion> &innerStub,
 		    const ap_uint<kNBits_MemAddr>  outerIndex,
@@ -700,6 +701,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion, uint32_t TPROJMaskBarrel, uint32_t TPROJMaskDisk> void
 TC::processStubPair(
     const BXType bx,
+    const ap_uint<TrackletParameters::kTParPhiRegionSize> phiRegion,
     const ap_uint<kNBits_MemAddr> innerIndex,
     const AllStub<InnerRegion> &innerStub,
     const ap_uint<kNBits_MemAddr>  outerIndex,
@@ -752,7 +754,7 @@ TC::processStubPair(
   else //disk seeds
     success = TC::diskSeeding<Seed, InnerRegion, OuterRegion>(negDisk, innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
   // Write the tracklet parameters and projections to the output memories.
-  const TrackletParameters tpar(stubIndex1,stubIndex2, rinv, phi0, z0, t);
+  const TrackletParameters tpar(phiRegion, stubIndex1, stubIndex2, rinv, phi0, z0, t);
   if (success) trackletParameters->write_mem(bx, tpar, npar++);
 
 bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
@@ -897,6 +899,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
   constexpr bool overlapSeed = (Seed == TF::L1D1 || Seed == TF::L2D1);
+  constexpr bool L1InnerSeed = (Seed == TF::L1L2 || Seed == TF::L1D1) ;
   //AS Memories are cast from DISK into DISKPS types in overlap and disk seeds
   constexpr regionType innerASType = diskSeed ? DISKPS : InnerRegion<Seed>();
   constexpr regionType outerASType = (diskSeed || overlapSeed) ? DISKPS : OuterRegion<Seed>();
@@ -982,6 +985,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   ap_uint<1> idlete = true;
 
   typename AllStub<innerASType>::AllStubData innerStubData = 0;
+  ap_uint<TrackletParameters::kTParPhiRegionSize> phiRegion = 0;
   bool negDisk_ = false;
   typename TEBuffer<Seed,iTC,innerASType,OuterRegion<Seed>()>::NSTUBS innerIndex = 0;
   typename TEBuffer<Seed,iTC,innerASType,OuterRegion<Seed>()>::NSTUBS outerIndex = 0;
@@ -1072,9 +1076,9 @@ teunits[k].idle_;
 
     if (HaveTEData) {
       if (diskSeed) //pass in negdisk if disk seed
-        TC::processStubPair<Seed, innerASType, outerASType, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk, negDisk_);
+        TC::processStubPair<Seed, innerASType, outerASType, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, phiRegion, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk, negDisk_);
       else
-        TC::processStubPair<Seed, innerASType, outerASType, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
+        TC::processStubPair<Seed, innerASType, outerASType, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, phiRegion, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
     
 
@@ -1129,33 +1133,22 @@ teunits[k].idle_;
 
         (ptinnerindexfirst,ptinnerindexlast) = (idphitmp,ir,innerbend);
         (ptouterindexfirst,ptouterindexlast) = (idphitmp,ir,outerbend);
-        switch(ptinnerindexfirst){ //pt LUTs split into 4 since vivado has a 1024 bit limit for csynth, FIXME better way to do this?
-          case 0:
-          lutinner = teunits[k].stubptinnerlutnew1_[ptinnerindexlast];
-          break;
-          case 1:
-          lutinner = teunits[k].stubptinnerlutnew2_[ptinnerindexlast];
-          break;
-          case 2:
-          lutinner = teunits[k].stubptinnerlutnew3_[ptinnerindexlast];
-          break;
-          case 3:
-          lutinner = teunits[k].stubptinnerlutnew4_[ptinnerindexlast];
-          break;
+
+        if (diskSeed){ //for disk/overlap seeds, pt luts are split into 2/4 parts, due to vivado_hls limit on array sizes
+          lutinner = (ptinnerindexfirst == 0) ? teunits[k].stubptinnerlutnew1_[ptinnerindexlast] :
+                     teunits[k].stubptinnerlutnew2_[ptinnerindexlast];
+          lutouter = (ptouterindexfirst == 0) ? teunits[k].stubptouterlutnew1_[ptouterindexlast] :
+                     teunits[k].stubptouterlutnew2_[ptouterindexlast];
         }
-        switch(ptouterindexfirst){
-          case 0:
-          lutouter = teunits[k].stubptouterlutnew1_[ptouterindexlast];
-          break;
-          case 1:
-          lutouter = teunits[k].stubptouterlutnew2_[ptouterindexlast];
-          break;
-          case 2:
-          lutouter = teunits[k].stubptouterlutnew3_[ptouterindexlast];
-          break;
-          case 3:
-          lutouter = teunits[k].stubptouterlutnew4_[ptouterindexlast];
-          break;
+        else{
+          lutinner = (ptinnerindexfirst == 0) ? teunits[k].stubptinnerlutnew1_[ptinnerindexlast] :
+                     (ptinnerindexfirst == 1) ? teunits[k].stubptinnerlutnew2_[ptinnerindexlast] :
+                     (ptinnerindexfirst == 2) ? teunits[k].stubptinnerlutnew3_[ptinnerindexlast] :
+                     teunits[k].stubptinnerlutnew4_[ptinnerindexlast];
+          lutouter = (ptouterindexfirst == 0) ? teunits[k].stubptouterlutnew1_[ptouterindexlast] :
+                     (ptouterindexfirst == 1) ? teunits[k].stubptouterlutnew2_[ptouterindexlast] :
+                     (ptouterindexfirst == 2) ? teunits[k].stubptouterlutnew3_[ptouterindexlast] :
+                     teunits[k].stubptouterlutnew4_[ptouterindexlast];
         }
       }
       else{ //Barrel Seeds
@@ -1165,9 +1158,11 @@ teunits[k].idle_;
         lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
       }
       ap_uint<1> savestub = teunits[k].good___ && inrange && lutinner && lutouter && rzcut;
+      ap_uint<TrackletParameters::kTParPhiRegionSize> phiregion = teunits[k].innerstub___.getFinePhi().range(7, L1InnerSeed?5:6);
       teunits[k].stubids_[teuwriteindex[k]] = (teunits[k].outervmstub___.getIndex(),
-		    teunits[k].innerstub___.getAllStub(),
-			  teunits[k].innerstub___.getIndex());
+					       teunits[k].innerstub___.getAllStub(),
+					       phiregion, 
+					       teunits[k].innerstub___.getIndex());
       if (diskSeed)
         teunits[k].negDisk_[teuwriteindex[k]] = teunits[k].innerstub___.getNegDisk();
 
@@ -1393,7 +1388,7 @@ teunits[k].idle_;
     iTE=~iTE;
     HaveTEData = teunotempty.or_reduce();
     idlete = teuidle.or_reduce();
-    (outerIndex, innerStubData, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
+    (outerIndex, innerStubData, phiRegion, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
     if (diskSeed)
       negDisk_ = teunits[iTE].negDisk_[teureadindex[iTE]];
   } //end of istep
