@@ -29,7 +29,7 @@ use work.emp_slink_types.all;
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg.all;
-use work.tf_interface_pkg.all;
+--use work.tf_interface_pkg.all;
 use work.hybrid_data_types.all;
 use work.hybrid_config.all;
 use work.hybrid_data_formats.all;
@@ -62,14 +62,14 @@ architecture rtl of emp_payload is
   signal s_IR_data             : t_arr_DL_39_DATA;
   signal s_ir_start            : std_logic;
   signal s_bx                  : std_logic_vector(2 downto 0);
-  signal s_TW_104_stream_data  : t_arr_TW_104_DATA;
-  signal s_TW_104_stream_valid : t_arr_TW_104_1b;
-  signal s_BW_46_stream_data   : t_arr_BW_46_DATA;
-  signal s_BW_46_stream_valid  : t_arr_BW_46_1b;
-  signal s_FT_bx_out_vld       : std_logic;
-  signal s_tftokf              : t_channlesTB(numTW_104 - 1 downto 0);
-  signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
-  signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
+  --signal s_TW_104_stream_data  : t_arr_TW_104_DATA;
+  --signal s_TW_104_stream_valid : t_arr_TW_104_1b;
+  --signal s_BW_46_stream_data   : t_arr_BW_46_DATA;
+  --signal s_BW_46_stream_valid  : t_arr_BW_46_1b;
+  signal s_TP_bx_out_vld       : std_logic;
+  --signal s_tftokf              : t_channlesTB(numTW_104 - 1 downto 0);
+  --signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
+  --signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
 
 begin  -- architecture rtl
 
@@ -107,73 +107,12 @@ begin  -- architecture rtl
       reset                    => rst,
       IR_start                 => s_ir_start,
       IR_bx_in                 => s_bx,
-      FT_bx_out                => open,
-      FT_bx_out_vld            => s_FT_bx_out_vld,
-      FT_done                  => open,
+      TP_bx_out_0              => open,
+      TP_bx_out_vld            => s_TP_bx_out_vld,
+      TP_done                  => open,
       DL_39_link_AV_dout       => s_IR_data,
       DL_39_link_empty_neg     => (others => '1'),
-      DL_39_link_read          => open,
-      TW_104_stream_AV_din     => s_TW_104_stream_data,
-      TW_104_stream_A_full_neg => (others => '1'),
-      TW_104_stream_A_write    => s_TW_104_stream_valid,
-      BW_46_stream_AV_din      => s_BW_46_stream_data,
-      BW_46_stream_A_full_neg  => (others => '1'),
-      BW_46_stream_A_write     => s_BW_46_stream_valid
+      DL_39_link_read          => open
       );
-
-  -----------------------------------------------------------------------------
-  -- Sector Processor to Link formatter
-  -----------------------------------------------------------------------------
-  -- secproctolink_1 : entity work.secproctolink
-  --   port map (
-  --     clk_i                    => clk_p,
-  --     TW_104_stream_data_i     => s_TW_104_stream_data,
-  --     TW_104_stream_write_i    => s_TW_104_stream_valid,
-  --     TW_104_stream_full_neg_o => open,
-  --     BW_46_stream_data_i      => s_BW_46_stream_data,
-  --     BW_46_stream_write_i     => s_BW_46_stream_valid,
-  --     BW_46_stream_full_neg_i  => open,
-  --     dout_o                   => q
-  --     );
-
-  -----------------------------------------------------------------------------
-  -- Sector Processor to KF formatter
-  -----------------------------------------------------------------------------
-  tf_to_kf_1 : entity work.tf_to_kf
-    port map (
-      clk_i          => clk_p,
-      TW_104_data_i  => s_TW_104_stream_data,
-      TW_104_valid_i => s_TW_104_stream_valid,
-      BW_46_data_i   => s_BW_46_stream_data,
-      BW_46_valid_i  => s_BW_46_stream_valid,
-      kf_reset_i     => s_FT_bx_out_vld,
-      tftokf_o       => s_tftokf
-      );
-
-  -----------------------------------------------------------------------------
-  -- KF
-  -----------------------------------------------------------------------------
-  kf_wrapper_1 : entity work.kf_wrapper
-    port map (
-      clk_i   => clk_p,
-      kfin_i  => s_tftokf,
-      kfout_o => s_kfout
-      );
-
-  -----------------------------------------------------------------------------
-  -- Output step
-  -----------------------------------------------------------------------------
-  kfout_isolation_out_1 : entity work.kfout_isolation_out
-    port map (
-      clk        => clk_p,
-      out_packet => conv(d),
-      out_din    => s_kfout,
-      out_dout   => s_tfout
-      );
-
-  q(108)        <= s_tfout(0);
-  q(109)        <= s_tfout(1);
-  --q(120).strobe <= '1';
-  --q(121).strobe <= '1';
 
 end architecture rtl;

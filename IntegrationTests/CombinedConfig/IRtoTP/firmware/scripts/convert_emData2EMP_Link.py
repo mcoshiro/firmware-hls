@@ -19,8 +19,20 @@ def parseArguments():
 
 # Files in order in which they are referred to in memUtil_pkg.vhd.
 # with key being channel number.
-channel_names = ["PS10G_1_A", "PS10G_1_B", "PS10G_2_A", "PS10G_2_B", "PS10G_3_A", "PS10G_3_B", "PS_1_A", "PS_1_B", "PS_2_A", "PS_2_B", "negPS10G_1_A", "negPS10G_1_B", "negPS10G_2_A", "negPS10G_2_B", "negPS10G_3_A", "negPS10G_3_B", "negPS_1_A", "negPS_1_B", "negPS_2_A", "negPS_2_B", "2S_1_A", "2S_1_B", "2S_2_A", "2S_2_B", "2S_3_A", "2S_3_B", "2S_4_A", "2S_4_B", "neg2S_1_A", "neg2S_1_B", "neg2S_2_A", "neg2S_2_B", "neg2S_3_A", "neg2S_3_B", "neg2S_4_A", "neg2S_4_B"]
-channel_numbers = [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107]
+channel_names = ['PS10G_1_A','PS10G_1_B','PS10G_2_A','PS10G_2_B','PS10G_3_A',
+                 'PS10G_3_B','PS10G_4_A','PS10G_4_B','PS_1_A','PS_1_B','PS_2_A',
+                 'PS_2_B','negPS10G_1_A','negPS10G_1_B','negPS10G_2_A',
+                 'negPS10G_2_B','negPS10G_3_A','negPS10G_3_B','negPS10G_4_A',
+                 'negPS10G_4_B','negPS_1_A','negPS_1_B','negPS_2_A','negPS_2_B',
+                 'twoS_1_A','twoS_1_B','twoS_2_A','twoS_2_B','twoS_3_A','twoS_3_B',
+                 'twoS_4_A','twoS_4_B','twoS_5_A','twoS_5_B','twoS_6_A','twoS_6_B',
+                 'neg2S_1_A','neg2S_1_B','neg2S_2_A','neg2S_2_B','neg2S_3_A',
+                 'neg2S_3_B','neg2S_4_A','neg2S_4_B','neg2S_5_A','neg2S_5_B',
+                 'neg2S_6_A','neg2S_6_B']
+
+channel_numbers = [68,69,70,71,72,73,74,75,76,77,78,79,84,85,86,87,88,89,90,91,92,93,
+                   94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,
+                   112,113,114,115,116,117,118,119]
 
 mapping = {}
 for ich in range(len(channel_names)):

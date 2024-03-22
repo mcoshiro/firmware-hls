@@ -17,14 +17,13 @@ $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py -s $(hls_script_path)
 
 kfin_adj:
-	@cd ../../../../KalmanFilter; git checkout 997f838
 	@python3 scripts/kf_link_mod.py
 
 xciCreation: $(core_file)
 	make -f $(core_file) -j 8 all
 
 hdl_add_files: $(core_file)
-	cd hdl; ln -s ../../../hdl/*.vhd .
+	cd hdl; ln -s ../../hdl/*.vhd .
 
 lut_inclusion:
 	@python3 scripts/lut_copy.py
